@@ -14,7 +14,7 @@ from wheel import Wheel
 from spritesheet import Spritesheet
 from clock import Clock
 from interaction import Interaction
-from variables import WIDTH, HEIGHT, GAME_LENGTH, BUTTON_WIDTH, GAME_STARTED, GAME_OVER, DISPLAY_INSTRUCTIONS, DISPLAY_LEVEL_CHOICE, start_time, elapsed_time, points, EXPLOSION_IMG, BANNER_IMG
+from variables import WIDTH, HEIGHT, GAME_LENGTH, BUTTON_WIDTH, GAME_STARTED, GAME_OVER, DISPLAY_INSTRUCTIONS, DISPLAY_LEVEL_CHOICE, start_time, elapsed_time, points, EXPLOSION_IMG, BANNER_IMG,final_points
 
 # Additional constants for rock spawning.
 SPAWN_OFFSET = 300  # Increased so rocks spawn further ahead of the truck.
@@ -93,7 +93,7 @@ def draw_gameplay(canvas, offset, elapsed_time, points):
     
     # Draw lives.
     lives.draw(canvas)
-    lives.loose_life(canvas)
+    
     
     # Draw the road and banner.
     canvas.draw_polygon([(0 - offset, HEIGHT - 100), (GAME_LENGTH - offset, HEIGHT - 100),
@@ -132,8 +132,24 @@ def draw_explosion(canvas, offset):
 
 def draw_game_over(canvas, points, elapsed_time):
     canvas.draw_text("FINISHED", (WIDTH / 2 - 100, HEIGHT / 2), 50, "green", "monospace")
-    canvas.draw_text("POINTS: " + str(points), (WIDTH / 2 - 100, HEIGHT / 2 + 60), 40, "green", "monospace")
+    canvas.draw_text("POINTS: " + str(final_points), (WIDTH / 2 - 100, HEIGHT / 2 + 60), 40, "green", "monospace")
     canvas.draw_text("TIME: " + str(int(elapsed_time)) + "s", (WIDTH / 2 - 100, HEIGHT / 2 - 200), 50, "green", "monospace")
+
+def draw_lives(canvas, offset):
+    if truck.on_ground: # truck only explodes on ground
+            if truck.angle > 1.2 or truck.angle < -1.2:
+                if lives.three_lives:
+                    lives.three_lives = False
+                    truck.angle = 0
+                elif lives.two_lives:
+                    lives.two_lives = False
+                    truck.angle = 0
+                elif lives.one_life:
+                    lives.one_life = False
+                
+    if lives.one_life == False:  # once all lives are lost
+        draw_explosion(canvas, offset)
+        # end game
 
 def draw(canvas):
     global elapsed_time, points, GAME_OVER, GAME_STARTED
@@ -148,19 +164,20 @@ def draw(canvas):
         offset = max(0, truck.pos.x - WIDTH / 2)
         if offset > GAME_LENGTH - WIDTH:
             offset = GAME_LENGTH - WIDTH
+        base_points = 10
+        time_penalty = int(elapsed_time)
+        distance_bonus = int(truck.pos.x / 100) * 5
+        points = max(0, base_points - time_penalty + distance_bonus)
         draw_gameplay(canvas, offset, elapsed_time, points)
-        
-        # Check for game over condition.
+
+        # Check if the game is over
         if truck.pos.x >= GAME_LENGTH - 100:
-            points = 300 // int(elapsed_time)
+            final_points = points 
             GAME_OVER = True
             GAME_STARTED = False
+            final_points = points 
         
-        # Optional: Trigger explosion if truck is overly rotated on the ground.
-        if truck.on_ground:
-            if truck.angle >= math.pi/2 or truck.angle <= -math.pi/2:
-                draw_explosion(canvas, offset)
-                lives.three_lives = False
+        draw_lives(canvas, offset)    
     if GAME_OVER:
         draw_game_over(canvas, points, elapsed_time)
 
