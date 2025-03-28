@@ -21,19 +21,28 @@ class Spritesheet:
         frame_x = self.frame_index[1] * self.frame_width
         frame_y = self.frame_index[0] * self.frame_height
 
-        canvas.draw_image(self.img,
-                          (frame_x + self.frame_width / 2, frame_y + self.frame_height / 2),
-                          (self.frame_width, self.frame_height),
-                          (truck.pos.x - offset, truck.pos.y - 70),
-                          (self.frame_width*2.5, self.frame_height*2.5))
+        if not self.fin:
+           canvas.draw_image(self.img,
+                              (frame_x + self.frame_width / 2, frame_y + self.frame_height / 2),
+                             (self.frame_width, self.frame_height),
+                             (truck.pos.x - offset, truck.pos.y - 70),
+                              (self.frame_width*2.5, self.frame_height*2.5))
+      
 
     def next_frame(self):
+        if self.fin: 
+            return
+
         row, col = self.frame_index
         col += 1
-        if not self.fin:
-            if col >= self.columns:
-                col = 0
-                row += 1
-                if row >= self.rows:
-                    row = 0
-            self.frame_index = (row, col)
+        if col >= self.columns: 
+            col = 0
+            row += 1
+            if row >= self.rows:
+                self.fin = True 
+                row = 0
+        self.frame_index = (row, col)
+
+    def reset(self):
+        self.frame_index = (0, 0)
+        self.fin = False     
