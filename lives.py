@@ -18,10 +18,5 @@ class Lives:
         if self.three_lives:
             canvas.draw_image(HEART_IMG, (60, 60), (120, 120), (920, 25), (60, 60))
 
-    def loose_life(self, canvas):
-        if not self.one_life:
-            canvas.draw_image(HEART_IMG, (60, 180), (120, 120), (800, 25), (60, 60))
-        if not self.two_lives:
-            canvas.draw_image(HEART_IMG, (60, 180), (120, 120), (860, 25), (60, 60))
-        if not self.three_lives:
-            canvas.draw_image(HEART_IMG, (60, 180), (120, 120), (920, 25), (60, 60))
+    # The empty heart drawing from loose_life() has been merged into draw()
+  # (i.e. both full and missing lives are drawn within draw())
