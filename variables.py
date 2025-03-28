@@ -17,7 +17,7 @@ DISPLAY_LEVEL_CHOICE = False
 start_time = 0
 elapsed_time = 0
 points = 0
-
+final_points = 0
 # Load Images
 TRUCK_IMG_URL = "https://opengameart.org/sites/default/files/Body.png"
 TYRE_IMG_URL = "https://opengameart.org/sites/default/files/Tire.png"
